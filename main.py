@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 import pymongo
 client=pymongo.MongoClient("mongodb://localhost:27017/")
 db=client["forbes"]
@@ -10,8 +9,11 @@ def addJson():
             "cookie": "notice_gdpr_prefs"
        })
     r=r.json()
+    nr=0
     for person in r["personList"]["personsLists"]:
-        col.insert_one(person)
+        if nr<200:
+            col.insert_one(person)
+            nr=nr+1
 
 def youngest():
     print("\nTen youngest billionaires:\n")
@@ -40,7 +42,8 @@ def philanthropy():
         if contor<=10 or x['philanthropyScore']==5:
             print(contor,x['personName']+", philanthropyScore =",x['philanthropyScore'])
             contor=contor+1
-
+addJson()
 youngest()
 numberOfAmericans()
 philanthropy()
+col.drop()
